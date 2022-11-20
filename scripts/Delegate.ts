@@ -4,11 +4,12 @@ import { ElevenToken__factory } from "../typechain-types";
 dotenv.config();
 
 // Delegate tokens for voting power with the following CLI command:
-// yarn run ts-node --files ./scripts/Delegate.ts <contractAddress>
+// yarn run ts-node --files ./scripts/Delegate.ts <contractAddress> <delegateeAddress>
 // Example:
-// yarn run ts-node --files ./scripts/Delegate.ts 0xB3133b08414322F3D551ac9ADd3B27Ce057248F3
+// yarn run ts-node --files ./scripts/Delegate.ts 0xB3133b08414322F3D551ac9ADd3B27Ce057248F3 0x849bf00cd4612e3d2033bc10b64ac970d2bb427f
 async function main() {
   const contractAddress = process.argv[2];
+  const delegateeAddress = process.argv[3];
 
   const provider = ethers.getDefaultProvider("goerli", {
     alchemy: process.env.ALCHEMY_API_KEY,
@@ -16,19 +17,20 @@ async function main() {
     infura: process.env.INFURA_API_KEY,
   });
   const wallet = new ethers.Wallet(process.env.KEY ?? "");
-  const voter = wallet.connect(provider);
-  const contractFactory = new ElevenToken__factory(voter);
+  const signer = wallet.connect(provider);
+  const contractFactory = new ElevenToken__factory(signer);
   const contract = contractFactory.attach(contractAddress);
-  console.log(`Connected to the wallet of ${voter.address}`);
-  console.log(`The voter has a balance of ${await voter.getBalance()} wei.`);
+  console.log(`Connected to the wallet of ${signer.address}`);
+  console.log(`The signer has a balance of ${await signer.getBalance()} wei.`);
 
-  let votePower = await contract.getVotes(voter.address);
-  console.log(`The voter has ${votePower} decimals of vote power`);
-  const delegateTx = await contract.connect(voter).delegate(voter.address);
+  console.log(`The signer is delegating their votes to ${delegateeAddress}`);
+  let votePower = await contract.getVotes(delegateeAddress);
+  console.log(`The delegatee has ${votePower} decimals of vote power`);
+  const delegateTx = await contract.connect(signer).delegate(delegateeAddress);
   await delegateTx.wait();
-  votePower = await contract.getVotes(voter.address);
+  votePower = await contract.getVotes(delegateeAddress);
   console.log(
-    `After the self delegation, the voter has ${votePower} decimals of vote power`
+    `After the delegation, the delegatee has ${votePower} decimals of vote power`
   );
 }
 
