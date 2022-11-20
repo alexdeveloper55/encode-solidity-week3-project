@@ -23,14 +23,20 @@ async function main() {
   console.log(`Connected to the wallet of ${signer.address}`);
   console.log(`The signer has a balance of ${await signer.getBalance()} wei.`);
 
-  console.log(`The signer is delegating their votes to ${delegateeAddress}`);
-  let votePower = await contract.getVotes(delegateeAddress);
-  console.log(`The delegatee has ${votePower} decimals of vote power`);
+  console.log(`The signer is delegating their votes to ${delegateeAddress}\n`);
+
+  console.log(
+    `The delegatee has ${await contract.getVotes(
+      delegateeAddress
+    )} decimals of vote power`
+  );
   const delegateTx = await contract.connect(signer).delegate(delegateeAddress);
   await delegateTx.wait();
-  votePower = await contract.getVotes(delegateeAddress);
+  console.log(`The delegation transaction hash is ${delegateTx.hash}`);
   console.log(
-    `After the delegation, the delegatee has ${votePower} decimals of vote power`
+    `After the delegation, the delegatee has ${await contract.getVotes(
+      delegateeAddress
+    )} decimals of vote power`
   );
 }
 

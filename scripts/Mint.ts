@@ -5,6 +5,7 @@ dotenv.config();
 
 // Mint tokens for an address with the following CLI command:
 // yarn run ts-node --files ./scripts/Mint.ts <contractAddress> <minteeAddress> <mintAmount>
+// Example:
 // yarn run ts-node --files ./scripts/Mint.ts 0xB3133b08414322F3D551ac9ADd3B27Ce057248F3 0xfd989feC5E85CF8487d6A558ecB98381C97B6ECF 1
 async function main() {
   const contractAddress = process.argv[2];
