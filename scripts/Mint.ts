@@ -3,11 +3,13 @@ import * as dotenv from "dotenv";
 import { ElevenToken__factory } from "../typechain-types";
 dotenv.config();
 
-const MINT_VALUE = ethers.utils.parseEther("1");
-
-// MINTING TOKENS FOR THE VOTER/SIGNER
+// Mint tokens for an address with the following CLI command:
+// yarn run ts-node --files ./scripts/Mint.ts <contractAddress> <minteeAddress> <mintAmount>
+// yarn run ts-node --files ./scripts/Mint.ts 0xB3133b08414322F3D551ac9ADd3B27Ce057248F3 0xfd989feC5E85CF8487d6A558ecB98381C97B6ECF 1
 async function main() {
   const contractAddress = process.argv[2];
+  const minteeAddress = process.argv[3];
+  const mintAmount = ethers.utils.parseEther(process.argv[4]);
 
   const provider = ethers.getDefaultProvider("goerli", {
     alchemy: process.env.ALCHEMY_API_KEY,
@@ -22,7 +24,7 @@ async function main() {
 
   console.log(`Attaching to contract: ${contractAddress}\n`);
   const contractFactory = new ElevenToken__factory(signer);
-  const contract = await contractFactory.attach(contractAddress);
+  const contract = contractFactory.attach(contractAddress);
 
   console.log(
     `Connected to contract at address ${contract.address},
@@ -32,13 +34,16 @@ async function main() {
     `
   );
 
-  let signerTokenBalance = await contract.balanceOf(signer.address);
-  console.log(`The signer starts with ${signerTokenBalance} balance`);
+  let minteeTokenBalance = await contract.balanceOf(minteeAddress);
+  console.log(
+    `The mintee ${minteeAddress} starts with ${minteeTokenBalance} balance`
+  );
   console.log(`Minting...`);
-  const mintTx = await contract.mint(signer.address, MINT_VALUE);
+  const mintTx = await contract.mint(minteeAddress, mintAmount);
   await mintTx.wait();
-  signerTokenBalance = await contract.balanceOf(signer.address);
-  console.log(`The signer now has ${signerTokenBalance} balance`);
+  console.log(`The mint transaction hash is ${mintTx.hash}`);
+  minteeTokenBalance = await contract.balanceOf(minteeAddress);
+  console.log(`The mintee now has ${minteeTokenBalance} balance`);
 }
 
 main().catch((err) => {
