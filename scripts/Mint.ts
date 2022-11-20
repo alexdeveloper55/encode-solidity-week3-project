@@ -18,9 +18,8 @@ async function main() {
   });
   const wallet = new ethers.Wallet(process.env.KEY ?? "");
   const signer = wallet.connect(provider);
-  const balance = await signer.getBalance();
   console.log(`Connected to the wallet of ${signer.address}`);
-  console.log(`The signer has a balance of ${balance} wei.`);
+  console.log(`The signer has a balance of ${await signer.getBalance()} wei.`);
 
   console.log(`Attaching to contract: ${contractAddress}\n`);
   const contractFactory = new ElevenToken__factory(signer);
