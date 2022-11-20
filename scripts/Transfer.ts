@@ -3,6 +3,10 @@ import { ElevenToken__factory } from "../typechain-types";
 import * as dotenv from "dotenv";
 dotenv.config();
 
+// Transfer tokens to an adress with the following CLI command:
+// yarn run ts-node --files ./scripts/Transfer.ts <contractAddress> <receivingAddress> <amount>
+// Example:
+// yarn run ts-node --files ./scripts/Transfer.ts 0xB3133b08414322F3D551ac9ADd3B27Ce057248F3 0xfd989feC5E85CF8487d6A558ecB98381C97B6ECF 2
 async function main() {
   const contractAddress = process.argv[2];
   const receivingAddress = process.argv[3];
